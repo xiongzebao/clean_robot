@@ -76,6 +76,9 @@ public:
 	void SpeedDetection();
 	void addLeltPedometer(int step_count, void(*callback)(int));
 	void addRightPedometer(int step_count, void(*callback)(int));
+	void removeRightPedometer();
+	void removeLeftPedometer();
+	void removePedometer();
 	void setSpeedListener(void(*callback)(VehicleSpeed*));
 	VehicleSpeed getSpeed();
 	void startVelometer();

@@ -29,6 +29,8 @@ public:
 	static const int TWO_WHEEL_DRIVER = 2;
 
 
+
+
 public:
 	//四个电机
 	MyMotorClass *m1;
@@ -39,6 +41,11 @@ public:
 	int speed = 0;//记录当前小车速度
 	VelometerClass velometer;//测速器
 	int mode = FOUR_WHEEL_DRIVER;
+	static bool left_finished  ;
+	static bool right_finished  ;
+	static void (*on_turn_left)(int);
+	static void (*on_turn_right)(int);
+
 
 
 public:
@@ -62,7 +69,14 @@ public:
 	void brake();//制动
 	void adjustSpeed(struct VehicleSpeed* speed);//定时矫正速度，因为电机受摩擦和电池电压影响运转速度不稳定，要定时加减速以微调矫正到指定速度
 	void turnLeft(int degree);//左转度数，0~360
+	void turnLeft(int degree, void(*f)(int));
 	void turnRight(int degree);//右转度数，0~360
+	void turnRight(int degree, void(*f)(int));
+	void back(int distance,void(*f)(int));//向前移动指定距离（单位厘米）
+	void back(int distance);
+	void forward(int distance);//向后移动指定距离（单位厘米）
+	void forward(int distance,void(*f)(int x));//向后移动指定距离（单位厘米）
+
 	void startDetectSpeed();
 	void stopDetectSpeed();
 	VehicleSpeed  getSpeed();
@@ -71,9 +85,14 @@ public:
 		return velometer.leftSum;
 	}
 	void continueGo();
+
+	
 private:
 	void printSpeed(MyMotorClass *m);
-
+	
+	static void left_callback(int x);
+	static void right_callback(int x);
+	static void on_back_finished(int x);
 	
 
 };

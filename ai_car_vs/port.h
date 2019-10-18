@@ -16,18 +16,22 @@ const int motorB1 = 26;
 const int motorB2 = 28;
 const int pwdB = 7;
 
-const int down_forward = 34;
-const int down_back = 36;
-const int down_right = 38;
-const int down_left = 40;
+const int down_forward_gd = 34;
+const int down_back_gd = 36;
+const int down_right_gd = 38;
+const int down_left_gd = 40;
 
-const int back_left = 42;
-const int back_right = 44;
-const int left_back = 46;
-const int left_forward = 48;
-const int right_back = 50;
-const int right_forward = 52;
+const int back_left_gd = 42;
+const int back_right_gd = 44;
+const int left_back_gd = 46;
+const int left_forward_gd = 48;
+const int right_back_gd = 50;
+const int right_forward_gd = 52;
 
+const int back_left_crash = 52;
+const int back_right_crash = 52;
+const int forward_left_crash = 52;
+const int forward_right_crash = 52;
 
 
 #endif

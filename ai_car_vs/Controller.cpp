@@ -1,17 +1,73 @@
 #include "Controller.h"
 
+
+boolean is_going = false;
+boolean isForwarding = false;
+boolean isBacking = false;
+
+Controller* Controller::instance = nullptr;
+
+void Controller::on_forward_right_crash()
+{
+	auto a_lambda_func = [](int x) {
+		// instance->stop();
+		instance->left(30);
+	};
+	instance->mc->back(5, a_lambda_func);
+
+}
+
+void Controller::on_forward_left_crash()
+{
+	auto a_lambda_func = [](int x) {
+		// instance->stop();
+		instance->right(30);
+	};
+	instance->mc->back(5, a_lambda_func);
+}
+
+void Controller::on_back_right_crash()
+{
+	auto a_lambda_func = [](int x) {
+		// instance->stop();
+		instance->left(30);
+	};
+	instance->mc->forward(5, a_lambda_func);
+}
+
+void Controller::on_back_left_crash()
+{
+	auto a_lambda_func = [](int x) {
+		// instance->stop();
+		instance->right(30);
+	};
+	instance->mc->forward(5, a_lambda_func);
+}
+
 void Controller::initPort()
 {
-		pinMode(down_forward, INPUT);
-		pinMode(down_back, INPUT);
-		pinMode(down_right, INPUT);
-		pinMode(down_left, INPUT);
-		pinMode(back_left, INPUT);
-		pinMode(back_right, INPUT);
-		pinMode(left_back, INPUT);
-		pinMode(left_forward, INPUT);
-		pinMode(right_back, INPUT);
-		pinMode(right_forward, INPUT);
+		pinMode(down_forward_gd, INPUT);
+		pinMode(down_back_gd, INPUT);
+		pinMode(down_right_gd, INPUT);
+		pinMode(down_left_gd, INPUT);
+		pinMode(back_left_gd, INPUT);
+		pinMode(back_right_gd, INPUT);
+		pinMode(left_back_gd, INPUT);
+		pinMode(left_forward_gd, INPUT);
+		pinMode(right_back_gd, INPUT);
+		pinMode(right_forward_gd, INPUT);
+
+		pinMode(back_left_crash, INPUT);
+		pinMode(back_right_crash, INPUT);
+		pinMode(forward_left_crash, INPUT);
+		pinMode(forward_right_crash, INPUT);
+
+		
+		attachInterrupt(digitalPinToInterrupt(back_left_crash), on_back_left_crash, RISING);
+		attachInterrupt(digitalPinToInterrupt(back_right_crash), on_back_right_crash, RISING);
+		attachInterrupt(digitalPinToInterrupt(forward_left_crash), on_forward_left_crash, RISING);
+		attachInterrupt(digitalPinToInterrupt(forward_right_crash), on_forward_right_crash, RISING);
+
 }
 
 Controller::Controller(MotorControllerClass* mc)
@@ -25,49 +81,126 @@ Controller::Controller(MotorControllerClass* mc)
 
 void Controller::loop()
 {////红外亮0，灭1
-	switch (mc->state)
-	{
-	case MotorControllerClass::FORWARD:
-		forward();
-		break;
-	case MotorControllerClass::BACK:
-		back();
-		break;
-	case MotorControllerClass::RIGHT:
-		break;
-	case MotorControllerClass::LEFT:
-		break;
-	default:
-		break;
+	 
+	//前方悬空,后退5cm，右转30度
+	if (digitalRead(down_forward_gd) == 1) {
+		auto a_lambda_func = [](int x) {
+		// instance->stop();
+			instance->right(30); 
+		};
+		mc->back(5, a_lambda_func);
 	}
+	//后方悬空,前进5cm，左转30度
+	if (digitalRead(down_forward_gd) == 1) {
+		auto a_lambda_func = [](int x) {
+			// instance->stop();
+			instance->left(30);
+		};
+		mc->forward(5, a_lambda_func);
+	}
+	//左边悬空,后退5cm，右转30度
+	if (digitalRead(down_left_gd) == 1) {
+		auto a_lambda_func = [](int x) {
+			// instance->stop();
+			instance->right(30);
+		};
+		mc->back(5, a_lambda_func);
+	}
+	//右边悬空,后退5cm，左转30度
+	if (digitalRead(down_left_gd) == 1) {
+		auto a_lambda_func = [](int x) {
+			// instance->stop();
+			instance->left(30);
+		};
+		mc->back(5, a_lambda_func);
+	}
+
+/*以上是悬空处理*/
+
+	//右前方红外触发，后退5cm，左转30，前进
+	if (digitalRead(right_forward_gd) == 0) {
+		auto a_lambda_func = [](int x) {
+			// instance->stop();
+			instance->left(30);
+		};
+		mc->back(5, a_lambda_func);
+	}
+
+	//左前方红外触发，后退5cm，右转30，前进
+	if (digitalRead(right_forward_gd) == 0) {
+		auto a_lambda_func = [](int x) {
+			// instance->stop();
+			instance->right(30);
+		};
+		mc->back(5, a_lambda_func);
+	}
+
+	//右后方红外触发，前进5cm，左转30，前进
+	if (digitalRead(right_back_gd) == 0) {
+		auto a_lambda_func = [](int x) {
+			// instance->stop();
+			instance->left(30);
+		};
+		mc->forward(5, a_lambda_func);
+	}
+
+	//左后方红外触发，前进5cm，右转30，前进
+	if (digitalRead(left_back_gd) == 0) {
+		auto a_lambda_func = [](int x) {
+			// instance->stop();
+			instance->right(30);
+		};
+		mc->forward(5, a_lambda_func);
+	}
+
+
+	if (isForwarding && !mc->state == MotorControllerClass::FORWARD) {
+		auto a_lambda_func = [](int x) {
+			isForwarding = false;
+		};
+		 
+		mc->forward(30, a_lambda_func);
+	}
+
+	if (!isForwarding && !mc->state == MotorControllerClass::BACK) {
+		auto a_lambda_func = [](int x) {
+			isForwarding = true;
+		};
+
+		mc->back(20, a_lambda_func);
+	}
+
 }
+
+
+
 
 
 
 void Controller::forward()
 {
+	mc->forward();
+	//if (isLeftHover()||isRightHover()) {
+	// 
+	//	return;
+	//}
 
-	if (isLeftHover()||isRightHover()) {
-		mc->stop();
-		return;
-	}
-
-	if (isForwardHover()) {//如果前面有悬崖
-		mc->stop();
-	}else {
-		//判断前面是否有障碍物,传感器缺失，暂时不实现，仅前进
-		mc->forward();
-		Serial.println("forward");
-		return;
-	}
-	if (isBackHover()){
-		mc->stop();
-		return;//前后都是悬崖，即停止
-	}else {
-		//if (getBackState() != 3) {//后面有障碍物
-			mc->back();
-		
-	}
+	//if (isForwardHover()) {//如果前面有悬崖
+	//	mc->stop();
+	//}else {
+	//	//判断前面是否有障碍物,传感器缺失，暂时不实现，仅前进
+	//	mc->forward();
+	//	Serial.println("forward");
+	//	return;
+	//}
+	//if (isBackHover()){
+	//	mc->stop();
+	//	return;//前后都是悬崖，即停止
+	//}else {
+	//	//if (getBackState() != 3) {//后面有障碍物
+	//		mc->back();
+	//	
+	//}
 }
 
 
@@ -102,6 +235,16 @@ void Controller::right()
 {
 }
 
+void Controller::left(int degree)
+{
+	mc->turnLeft(30);
+}
+
+void Controller::right(int degree)
+{
+	mc->turnRight(30);
+}
+
 void Controller::stop()
 {
 	 
@@ -112,8 +255,8 @@ void Controller::stop()
 int Controller::getBackState()
 {
  
-	int back_left_level = digitalRead(back_left);
-	int back_right_level = digitalRead(back_right);
+	int back_left_level = digitalRead(back_left_gd);
+	int back_right_level = digitalRead(back_right_gd);
 	if (back_left_level == 0 && back_right_level == 0) {//后面有障碍物
 		return 0;
 	}
@@ -134,28 +277,28 @@ int Controller::getForwardState()
 
 bool Controller::isBackHover()
 {
-	if (digitalRead(down_back) == 1)
+	if (digitalRead(down_back_gd) == 1)
 		return true;
 	return false;
 }
 
 bool Controller::isForwardHover()
 {
-	if (digitalRead(down_forward) == 1)
+	if (digitalRead(down_forward_gd) == 1)
 		return true;
 	return false;
 }
 
 bool Controller::isLeftHover()
 {
-	if (digitalRead(down_left) == 1)
+	if (digitalRead(down_left_gd) == 1)
 		return true;
 	return false;
 }
 
 bool Controller::isRightHover()
 {
-	if (digitalRead(down_right) == 1)
+	if (digitalRead(down_right_gd) == 1)
 		return true;
 	return false;
 }

@@ -117,6 +117,28 @@ void   VelometerClass::addRightPedometer(int zhuanshu, void(*callback)(int))
 	this->hasRightPedometer = true;
 }
 
+void VelometerClass::removeRightPedometer()
+{
+	this->rightAllGridCount = 0;
+	this->onRightPedometer = nullptr;
+	this->hasRightPedometer = false;
+}
+
+void VelometerClass::removeLeftPedometer()
+{
+	this->leftAllGridCount = 0;
+	this->onLeftPedometer = nullptr;
+	this->hasLeftPedometer = false;
+}
+
+void VelometerClass::removePedometer()
+{
+	removeLeftPedometer();
+	removeRightPedometer();
+}
+
+
+
 //设置速度监听者，周期性回调
 void   VelometerClass::setSpeedListener(void(*callback)(VehicleSpeed*))
 {
