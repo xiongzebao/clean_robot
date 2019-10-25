@@ -1,5 +1,5 @@
 #include "Controller.h"
-
+#include"MyUtils.h"
 
 boolean is_going = false;
 boolean isForwarding = false;
@@ -9,6 +9,7 @@ Controller* Controller::instance = nullptr;
 
 void Controller::on_forward_right_crash()
 {
+	MyUtils.println("on_forward_right_crash");
 	auto a_lambda_func = [](int x) {
 		// instance->stop();
 		instance->left(30);
@@ -19,6 +20,7 @@ void Controller::on_forward_right_crash()
 
 void Controller::on_forward_left_crash()
 {
+	MyUtils.println("on_forward_left_crash");
 	auto a_lambda_func = [](int x) {
 		// instance->stop();
 		instance->right(30);
@@ -28,6 +30,7 @@ void Controller::on_forward_left_crash()
 
 void Controller::on_back_right_crash()
 {
+	MyUtils.println("on_back_right_crash");
 	auto a_lambda_func = [](int x) {
 		// instance->stop();
 		instance->left(30);
@@ -37,6 +40,7 @@ void Controller::on_back_right_crash()
 
 void Controller::on_back_left_crash()
 {
+	MyUtils.println("on_back_left_crash");
 	auto a_lambda_func = [](int x) {
 		// instance->stop();
 		instance->right(30);
@@ -57,16 +61,16 @@ void Controller::initPort()
 		pinMode(right_back_gd, INPUT);
 		pinMode(right_forward_gd, INPUT);
 
-		pinMode(back_left_crash, INPUT);
-		pinMode(back_right_crash, INPUT);
-		pinMode(forward_left_crash, INPUT);
-		pinMode(forward_right_crash, INPUT);
+		//pinMode(back_left_crash, INPUT);
+		//pinMode(back_right_crash, INPUT);
+		///pinMode(forward_left_crash, INPUT);
+	//	pinMode(forward_right_crash, INPUT);
 
 		
-		attachInterrupt(digitalPinToInterrupt(back_left_crash), on_back_left_crash, RISING);
-		attachInterrupt(digitalPinToInterrupt(back_right_crash), on_back_right_crash, RISING);
-		attachInterrupt(digitalPinToInterrupt(forward_left_crash), on_forward_left_crash, RISING);
-		attachInterrupt(digitalPinToInterrupt(forward_right_crash), on_forward_right_crash, RISING);
+		attachInterrupt(digitalPinToInterrupt(back_left_crash), Controller::on_back_left_crash, FALLING);
+		attachInterrupt(digitalPinToInterrupt(back_right_crash), Controller::on_back_right_crash, FALLING);
+		attachInterrupt(digitalPinToInterrupt(forward_left_crash), Controller::on_forward_left_crash, FALLING);
+		attachInterrupt(digitalPinToInterrupt(forward_right_crash), Controller::on_forward_right_crash, FALLING);
 
 }
 

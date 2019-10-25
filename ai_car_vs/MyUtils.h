@@ -46,10 +46,10 @@ public :
 		delay(3000);
 		int speed = ctrlor->getSpeed().leftSpeed;//获取当前左轮电机速度
 	 
-		//Serial.println(ctrlor->velometer.rightSum);
-		//Serial.println(ctrlor->velometer.leftSum);
-		//Serial.println("max speed:");
-		//Serial.println(speed);
+		//Serial2.println(ctrlor->velometer.rightSum);
+		//Serial2.println(ctrlor->velometer.leftSum);
+		//Serial2.println("max speed:");
+		//Serial2.println(speed);
 		//ctrlor->stopDetectSpeed();
 		//ctrlor->stop();
 	}
@@ -67,23 +67,23 @@ public:
 
 	 void println(String s) {
 		 if (Constant::isDebug==true) {
-			 Serial.println(s);
+			 Serial2.println(s);
 		 }
 	}
 
 	 void println(int i) {
 		 if (Constant::isDebug == true) {
-			 Serial.println(i);
+			 Serial2.println(i);
 		 }
 	 }
 	 void print(int i) {
 		 if (Constant::isDebug == true) {
-			 Serial.print(i);
+			 Serial2.print(i);
 		 }
 	 }
 	 void print(String i) {
 		 if (Constant::isDebug == true) {
-			 Serial.print(i);
+			 Serial2.print(i);
 		 }
 	 }
 

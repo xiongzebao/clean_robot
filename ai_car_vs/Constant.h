@@ -6,7 +6,7 @@ using namespace std;
 class Constant
 {
 public:
-	static  const bool  isDebug = true;
+	static  const bool  isDebug = false;
 	static  const String  SPEED_UP;
 	static  const String  SPEED_DOWN;
 	static  const String  SPEED_AT;
