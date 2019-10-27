@@ -27,7 +27,7 @@ public:
 
 	static const int FOUR_WHEEL_DRIVER = 1;
 	static const int TWO_WHEEL_DRIVER = 2;
-
+	static void onTimer( );
 
 
 
@@ -43,8 +43,7 @@ public:
 	int mode = FOUR_WHEEL_DRIVER;
 	static bool left_finished  ;
 	static bool right_finished  ;
-	static void (*on_turn_left)(int);
-	static void (*on_turn_right)(int);
+	
 
 
 
@@ -76,9 +75,7 @@ public:
 	void back(int distance);
 	void forward(int distance);//向后移动指定距离（单位厘米）
 	void forward(int distance,void(*f)(int x));//向后移动指定距离（单位厘米）
-
-	void startDetectSpeed();
-	void stopDetectSpeed();
+ 
 	VehicleSpeed  getSpeed();
 	void openLeftMotorMaxSpeed();//开启左边电机最大速度
 	int getLeftAllGridNum() {
@@ -89,9 +86,6 @@ public:
 	
 private:
 	void printSpeed(MyMotorClass *m);
-	
-	static void left_callback(int x);
-	static void right_callback(int x);
 	static void on_back_finished(int x);
 	
 

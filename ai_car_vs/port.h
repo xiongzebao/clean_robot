@@ -28,10 +28,10 @@ const int left_forward_gd = 48;
 const int right_back_gd = 50;
 const int right_forward_gd = 52;
 
-const int back_left_crash = 19;
-const int back_right_crash = 18;
-const int forward_left_crash = 21;
-const int forward_right_crash = 20;
+const int back_left_crash = 21;
+const int back_right_crash = 20;
+const int forward_left_crash = 18;
+const int forward_right_crash = 19;
 
 
 //Board	int.0	int.1	int.2	int.3	int.4	int.5

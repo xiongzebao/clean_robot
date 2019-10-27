@@ -25,13 +25,15 @@ public:
 
 class VelometerClass
 {
+
+public:
 	static VelometerClass* curVelometer;
 	static void onLeftCountStatic(void);//左轮计数回调函数 
 	static void onRightCountStatic(void);//右轮计数回调函数 
 	static void detectSpeed();
 
 private:
-	    const static int gridNum = 20;//一圈的栅格数
+	    const static int gridNum = 1;//一圈的栅格数
 		 static  float  velometerPeriod;//测速周期，默认500ms
 
 private:
@@ -81,8 +83,7 @@ public:
 	void removePedometer();
 	void setSpeedListener(void(*callback)(VehicleSpeed*));
 	VehicleSpeed getSpeed();
-	void startVelometer();
-	void stopVelometer();
+	 
 	MyMotorClass* getLeftMotor();
 	MyMotorClass* getRightMotor();
 

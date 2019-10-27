@@ -3,17 +3,19 @@
 #include"MyUtils.h"
 
 
+
 typedef void (*func_type)(int);
 boolean MotorControllerClass::left_finished = false;
 boolean MotorControllerClass::right_finished = false;
 
-func_type MotorControllerClass::on_turn_left = nullptr;
-func_type MotorControllerClass::on_turn_right = nullptr;
+
 
 MotorControllerClass* MotorControllerClass::instance = nullptr;
 //speed是当前实时车速，由测速器实时更新speed的值，更新频率默认1000ms
 void MotorControllerClass::adjustSpeed(VehicleSpeed* speed)
 {
+
+	return;
  
 	//如果行进方向是前进后退
  
@@ -98,29 +100,40 @@ void MotorControllerClass::turnLeft(int degree)
 	if (this->state == TURN_LEFT) {
 		return;
 	}
-	this->velometer.removePedometer();
 	auto a_lambda_func = [](int x) { 
 		MyUtils.println("turnLeft finish");
 		instance->forward();
 	};
 	turnLeft(degree, a_lambda_func);
+	MyUtils.println("turnLeft");
 }
 
 
 boolean left_finished = false;
 boolean right_finished = false;
+
+
+void MotorControllerClass::turnRight(int degree)
+{
+	if (this->state == TURN_RIGHT) {
+		return;
+	}
+	auto a_lambda_func = [](int x) {
+		MyUtils.println("turnRight finish");
+		instance->forward();
+	};
+	turnRight(degree, a_lambda_func);
+}
+
 void MotorControllerClass::turnLeft(int degree, void(*f)(int))
 {
 	if (this->state == TURN_LEFT) {
 		return;
 	}
-
 	this->velometer.removePedometer();
 	this->state = TURN_LEFT;
-	on_turn_left = f;
-	on_turn_right = nullptr;
-	this->velometer.addRightPedometer(degree, this->right_callback);
-	this->velometer.addLeltPedometer(degree, this->left_callback);
+
+	this->velometer.addRightPedometer(degree, f);
 	m1->forward();
 	m2->back();
 	if (mode == FOUR_WHEEL_DRIVER) {
@@ -128,29 +141,6 @@ void MotorControllerClass::turnLeft(int degree, void(*f)(int))
 		m4->back();
 	}
 	setSpeed(this->speed);
-	MyUtils.println("turnRight");
-}
-
-void MotorControllerClass::turnRight(int degree)
-{
-	if (this->state == TURN_RIGHT) {
-		return;
-	}
-	this->velometer.removePedometer();
-	auto a_lambda_func = [](int x) {
-		MyUtils.println("turnRight finish");
-		instance->stop();
-	};
-	this->velometer.addLeltPedometer(degree, a_lambda_func);
-	this->state = TURN_RIGHT;
-	m1->back();
-	m2->forward();
-	if (mode == FOUR_WHEEL_DRIVER) {
-		m3->forward();
-		m4->stop();
-	}
-	setSpeed(this->speed);
-	MyUtils.println("turnRight");
 
 }
 
@@ -159,10 +149,9 @@ void MotorControllerClass::turnRight(int degree, void(*f)(int))
 	if (this->state == TURN_RIGHT) {
 		return;
 	}
- 
 	this->velometer.removePedometer();
-	this->velometer.addLeltPedometer(degree, f);
 	this->state = TURN_RIGHT;
+	this->velometer.addRightPedometer(degree, f);//搞不清楚为什么addLeftPedometer不行！
 	m1->back();
 	m2->forward();
 	if (mode == FOUR_WHEEL_DRIVER) {
@@ -175,6 +164,8 @@ void MotorControllerClass::turnRight(int degree, void(*f)(int))
 
 void MotorControllerClass::back(int distance, void(*f)(int))
 {
+ 
+ 
 
 	if (this->state == BACK) {
 		return;
@@ -190,7 +181,7 @@ void MotorControllerClass::back(int distance, void(*f)(int))
 		m3->back();
 		m4->back();
 	}
-	setSpeed(this->speed);
+	//setSpeed(this->speed);
 }
 
 void MotorControllerClass::back(int distance)
@@ -233,7 +224,7 @@ void MotorControllerClass::forward(int distance, void(*f)(int x))
 	this->velometer.removePedometer();
 
 	int step_count = distance;
-	this->velometer.addLeltPedometer(step_count, f);
+	this->velometer.addRightPedometer(step_count, f);
 	this->state = FORWARD;
 	m1->forward();
 	m2->forward();
@@ -245,16 +236,9 @@ void MotorControllerClass::forward(int distance, void(*f)(int x))
 
 }
 
-void MotorControllerClass::startDetectSpeed()
-{
-	velometer.startVelometer();
-}
-
-void MotorControllerClass::stopDetectSpeed()
-{
-	velometer.stopVelometer();
-}
-
+ 
+ 
+ 
 VehicleSpeed MotorControllerClass::getSpeed()
 {
 	return velometer.getSpeed();
@@ -288,36 +272,8 @@ void MotorControllerClass::continueGo()
 	}
 }
 
-void MotorControllerClass::left_callback(int x)
-{
-	left_finished = true;
-	if (right_finished) {
-		if (on_turn_left != nullptr) {
-			(*on_turn_left)(x);
-			return;
-		}
-		if (on_turn_right != nullptr) {
-			(*on_turn_right)(x);
-			return;
-		}
-	}
 
-}
 
-void MotorControllerClass::right_callback(int x)
-{
-	right_finished = true;
-	if (left_finished) {
-		if (on_turn_left != nullptr) {
-			(*on_turn_left)(x);
-			return;
-		}
-		if (on_turn_right != nullptr) {
-			(*on_turn_right)(x);
-			return;
-		}
-	}
-}
 
 void MotorControllerClass::on_back_finished(int x)
 {
@@ -412,9 +368,10 @@ void MotorControllerClass::left()
 {
 	if (state == LEFT)
 		return;
-	this->velometer.removePedometer();
+	//this->velometer.removePedometer();
 	m1->forward();
 	m2->brake();
+
 	if (mode == FOUR_WHEEL_DRIVER) {
 		m3->stop();
 		m4->forward();

@@ -10,6 +10,7 @@
 #include "SerialController.h"
 #include "port.h"
 #include "Controller.h"
+#include "FlexiTimer2.h"
 
 
 
@@ -89,6 +90,8 @@ MyMotorClass rightMotor = MyMotorClass(motorB1, motorB2, pwdB);
 MotorControllerClass mc = MotorControllerClass(&rightMotor,&leftMotor);
 Controller* ctrl = Controller::newInstance(&mc);
 
+
+
 // Set pin 9's PWM frequency to 3906 Hz (31250/8 = 3906)
 // Note that the base frequency for pins 3, 9, 10, and 11 is 31250 Hz
 //setPwmFrequency(9, 8);
@@ -142,25 +145,31 @@ void setPwmFrequency2560(int pin, int divisor) {
 
 }
 
+
+void onTimer() {
+ 
+	Serial.flush();
+	VelometerClass::detectSpeed();
+ 
+}
+
 void setup() 
 {
-	Serial.begin(9600);
-	while (!Serial2) {
+	Serial.begin(115200);
+ 
+	while (!Serial) {
 		; 
 	}
-	//TCCR0B = TCCR0B & B11111000 | B00000101;
-//setPwmFrequency(6, 1024);
-	//setPwmFrequency(7, 1024);
 	setPwmFrequency2560(6, 1024);
 	MyUtils.println("welcome to clean robot");
-	mc.setSpeed(140);
-	mc.forward();
-
+	FlexiTimer2::set(Constant::velometerPeriod * 1000, onTimer); // 500ms period
+	FlexiTimer2::start();
+	mc.setSpeed(150);
 
 }
 
 void loop()
 {
-	//ctrl->loop();
+	
 }
 

@@ -26,16 +26,24 @@ void VelometerClass::detectSpeed()
 }
 
 //左轮栅格计数中断响应
-void   VelometerClass::onLeftCount()
-{
+void   VelometerClass::onLeftCount(){
+
+	if (this->leftSum % 50 == 0) {
+		MyUtils.print("leftSum:");
+		MyUtils.println(leftSum);
+		MyUtils.println(this->hasLeftPedometer);
+
+	}
 	if(this->hasLeftPedometer) {//计步器
 		this->currentLeftGridCount++;
-		if (this->currentLeftGridCount % 200 == 0) {
+		if (this->currentLeftGridCount % 50 == 0) {
 			MyUtils.println("currentLeftGridCount:");
 			MyUtils.println(currentLeftGridCount);
 		}
 
 		if (this->currentLeftGridCount == this->leftAllGridCount&& this->onLeftPedometer != nullptr) {
+			MyUtils.println("onLeftPedometer: call back");
+			
 			(*onLeftPedometer)(0);//达到记步数回调
 			this->onLeftPedometer = nullptr;
 			this->hasLeftPedometer = false;
@@ -49,17 +57,16 @@ void   VelometerClass::onLeftCount()
 //右轮栅格计数中断响应
 void   VelometerClass::onRightCount()
 {
-	Serial.println(currentRightGridCount);
+	//Serial.println(currentRightGridCount);
 	if (this->hasRightPedometer) {
 		this->currentRightGridCount++;
-		//MyUtils.println("currentRightGridCount:" + currentRightGridCount);
-		if (this->currentRightGridCount % 200 == 0) {
+		 
+		if (this->currentRightGridCount % 50 == 0) {
 			MyUtils.println("currentRightGridCount:");
 			MyUtils.println(currentRightGridCount);
 		}
  
 		if (this->currentRightGridCount == this->rightAllGridCount) {
-
 
 			(*onRightPedometer)(0);
 			Serial.println(currentRightGridCount);
@@ -78,6 +85,9 @@ void   VelometerClass::init(MyMotorClass *rightMotor, MyMotorClass *leftMotor)
 	setCurMy();
 	this->leftMotor = leftMotor;
 	this->rightMotor = rightMotor;
+	attachInterrupt(digitalPinToInterrupt(2), VelometerClass::onLeftCountStatic, FALLING);
+	attachInterrupt(digitalPinToInterrupt(3), VelometerClass::onRightCountStatic, FALLING);//wending
+
 }
 
 
@@ -88,9 +98,11 @@ void   VelometerClass::SpeedDetection()
 {
 
 	//转速单位是每分钟多少转，即r/min。这个编码器码盘为20个空洞。
-	float leftSpeed = (float)(this->leftCounter * 60 /20)/this->velometerPeriod;//小车车轮电机转速
-	float rightSpeed =(float)(this->rightCounter* 60/ 20)/this->velometerPeriod;//小车车轮电机转速
-																		   //恢复到编码器测速的初始状态
+	float leftSpeed = (float)(this->leftCounter)/Constant::velometerPeriod;//小车车轮电机转速
+	float rightSpeed =(float)(this->rightCounter)/ Constant::velometerPeriod;//小车车轮电机转速
+
+	//	Serial.println(leftSpeed);
+												   //恢复到编码器测速的初始状态
 	this->leftCounter = 0;   //把脉冲计数值清零，以便计算下一秒的脉冲计数
 	this->rightCounter = 0;
 
@@ -100,6 +112,8 @@ void   VelometerClass::SpeedDetection()
 	if (speedListener!= nullptr) {
 		(*speedListener)(&vs);
 	}
+
+	
 }
 
 //左轮计步器
@@ -108,6 +122,7 @@ void   VelometerClass::addLeltPedometer(int step_count, void(*callback)(int))
 	this->leftAllGridCount = step_count * this->gridNum;
 	this->onLeftPedometer = callback;
 	this->hasLeftPedometer = true;
+	MyUtils.println("addLeltPedometer");
 }
 
 void   VelometerClass::addRightPedometer(int zhuanshu, void(*callback)(int))
@@ -115,6 +130,7 @@ void   VelometerClass::addRightPedometer(int zhuanshu, void(*callback)(int))
 	this->rightAllGridCount = zhuanshu * this->gridNum;
 	this->onRightPedometer = callback;
 	this->hasRightPedometer = true;
+	MyUtils.println("addRightPedometer");
 }
 
 void VelometerClass::removeRightPedometer()
@@ -122,6 +138,7 @@ void VelometerClass::removeRightPedometer()
 	this->rightAllGridCount = 0;
 	this->onRightPedometer = nullptr;
 	this->hasRightPedometer = false;
+	MyUtils.println("removeRightPedometer");
 }
 
 void VelometerClass::removeLeftPedometer()
@@ -129,6 +146,7 @@ void VelometerClass::removeLeftPedometer()
 	this->leftAllGridCount = 0;
 	this->onLeftPedometer = nullptr;
 	this->hasLeftPedometer = false;
+	MyUtils.println("removeLeftPedometer");
 }
 
 void VelometerClass::removePedometer()
@@ -149,21 +167,7 @@ VehicleSpeed VelometerClass::getSpeed()
 {
 	return this->vs;
 }
-
-void VelometerClass::startVelometer()
-{
-	attachInterrupt(digitalPinToInterrupt(2), VelometerClass::onLeftCountStatic, FALLING);
-	attachInterrupt(digitalPinToInterrupt(3), VelometerClass::onRightCountStatic, FALLING);//wending
-	FlexiTimer2::set(VelometerClass::velometerPeriod*1000, VelometerClass::detectSpeed); // 500ms period
-	FlexiTimer2::start();
-}
-
-void VelometerClass::stopVelometer()
-{
-	detachInterrupt(digitalPinToInterrupt(2));
-	detachInterrupt(digitalPinToInterrupt(3));
-	FlexiTimer2::stop();
-}
+ 
 
 MyMotorClass* VelometerClass::getLeftMotor()
 {

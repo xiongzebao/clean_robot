@@ -12,3 +12,5 @@
   const String  Constant::FORWARD="forward";
   const String  Constant::BACK="back";
   const String  Constant::STOP="stop";
+
+  const float Constant::velometerPeriod = 1;
