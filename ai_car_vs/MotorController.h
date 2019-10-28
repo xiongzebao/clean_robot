@@ -43,6 +43,7 @@ public:
 	int mode = FOUR_WHEEL_DRIVER;
 	static bool left_finished  ;
 	static bool right_finished  ;
+	bool is_forward_back = false;
 	
 
 
@@ -75,6 +76,7 @@ public:
 	void back(int distance);
 	void forward(int distance);//向后移动指定距离（单位厘米）
 	void forward(int distance,void(*f)(int x));//向后移动指定距离（单位厘米）
+	void forward_back();
  
 	VehicleSpeed  getSpeed();
 	void openLeftMotorMaxSpeed();//开启左边电机最大速度

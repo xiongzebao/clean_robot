@@ -5,6 +5,10 @@ boolean is_going = false;
 boolean isForwarding = false;
 boolean isBacking = false;
 
+int turn_resulution = 10;
+unsigned long last_back_crash_time = 0;
+int fast_back_crash_times = 0;
+
 Controller* Controller::instance = nullptr;
 
 void Controller::on_forward_right_crash()
@@ -30,31 +34,52 @@ void Controller::on_forward_left_crash()
 	instance->mc->back(300, a_lambda_func);
 }
 
-int j = 0;
 void Controller::on_back_right_crash()
 {
-	j++;
 	MyUtils.println("on_back_right_crash");
-	MyUtils.println(j);
-	/*auto a_lambda_func = [](int x) {
-	
-		instance->left(100);
+
+	unsigned cur_time = millis();
+	unsigned interval = cur_time - last_back_crash_time;
+	if (interval <= 1000) {
+		fast_back_crash_times++;
+	}
+	else {
+		fast_back_crash_times = 0;
+	}
+	last_back_crash_time = cur_time;
+
+
+	auto a_lambda_func = [](int x) {
+		if (fast_back_crash_times >= 2) {
+			instance->left(turn_resulution * 5);
+		}
+		instance->left(turn_resulution);
 	};
-	instance->mc->forward(200, a_lambda_func);*/
-	instance->mc->forward();
+	instance->mc->forward(200, a_lambda_func);
+	
 }
 
 void Controller::on_back_left_crash()
 {
-	int level = digitalRead(forward_left_crash);
-	String ls = String(level);
-	MyUtils.println("on_back_left_crash:"+level);
-	//auto a_lambda_func = [](int x) {
-	//
-	//	instance->right(100);
-	//};
-	//instance->mc->forward(200, a_lambda_func);
-	instance->mc->forward();
+
+	unsigned cur_time = millis();
+	unsigned interval = cur_time - last_back_crash_time;
+	if (interval <= 1000) {
+		fast_back_crash_times++;
+	}else {
+		fast_back_crash_times = 0;
+	}
+	last_back_crash_time = cur_time;
+
+
+	auto a_lambda_func = [](int x) {
+	
+		if (fast_back_crash_times >= 2) {
+			instance->left(turn_resulution*5);
+		}
+		instance->left(turn_resulution);
+	};
+	instance->mc->forward(200, a_lambda_func);
 }
 
 void Controller::initPort()

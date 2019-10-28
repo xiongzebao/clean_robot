@@ -222,7 +222,6 @@ void MotorControllerClass::forward(int distance, void(*f)(int x))
 		return;
 	}
 	this->velometer.removePedometer();
-
 	int step_count = distance;
 	this->velometer.addRightPedometer(step_count, f);
 	this->state = FORWARD;
@@ -233,8 +232,25 @@ void MotorControllerClass::forward(int distance, void(*f)(int x))
 		m4->forward();
 	}
 	setSpeed(this->speed);
-
 }
+
+void MotorControllerClass::forward_back()
+{
+	is_forward_back = true;
+	while (is_forward_back)
+	{
+		auto a_lambda_func = [](int x) {
+			auto f = [](int x) {
+
+				instance->forward_back();
+			};
+			instance->back(200, f);
+		};
+		forward(400, a_lambda_func);
+	}
+	
+}
+
 
  
  
