@@ -237,17 +237,17 @@ void MotorControllerClass::forward(int distance, void(*f)(int x))
 void MotorControllerClass::forward_back()
 {
 	is_forward_back = true;
-	while (is_forward_back)
-	{
+ 
+ 
 		auto a_lambda_func = [](int x) {
 			auto f = [](int x) {
 
-				instance->forward_back();
+				//instance->forward_back();
 			};
 			instance->back(200, f);
 		};
 		forward(400, a_lambda_func);
-	}
+	
 	
 }
 

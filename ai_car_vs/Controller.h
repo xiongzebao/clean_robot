@@ -15,6 +15,9 @@ class Controller
 {
 	MotorControllerClass* mc;
 
+public:
+	bool is_interrupt = false;
+	bool is_finish_forward_back = false;
 
 public:
 	static  Controller *instance;
@@ -34,9 +37,20 @@ public:
 	void back();
 	void left();
 	void right();
+	void back_right();
+	void back_left();
+	void turn_left_right_random(int degree);
 	void left(int degree);
 	void right(int degree);
+	void left(int degree, void(*f)(int));
+	void right(int degree, void(*f)(int));
+	 
+ 
+	void back(int degree, void(*f)(int));
+	void forward(int degree, void(*f)(int));
+
 	void stop();
+	void forward_back();
 
 
 	int getBackState();

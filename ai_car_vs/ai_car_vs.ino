@@ -12,10 +12,6 @@
 #include "Controller.h"
 #include "FlexiTimer2.h"
 
-
-
-
-
 /**
  * Divides a given PWM pin frequency by a divisor.
  *
@@ -81,16 +77,10 @@ void setPwmFrequency(int pin, int divisor) {
 	}
 }
 
-
-
-
-
 MyMotorClass leftMotor = MyMotorClass(motorA2, motorA1, pwdA);
 MyMotorClass rightMotor = MyMotorClass(motorB1, motorB2, pwdB);
-MotorControllerClass mc = MotorControllerClass(&rightMotor,&leftMotor);
+MotorControllerClass mc = MotorControllerClass(&rightMotor, &leftMotor);
 Controller* ctrl = Controller::newInstance(&mc);
-
-
 
 // Set pin 9's PWM frequency to 3906 Hz (31250/8 = 3906)
 // Note that the base frequency for pins 3, 9, 10, and 11 is 31250 Hz
@@ -103,7 +93,7 @@ Controller* ctrl = Controller::newInstance(&mc);
 // Set pin 10's PWM frequency to 31 Hz (31250/1024 = 31)
 //setPwmFrequency(10, 1024);
 
- 
+
 void setPwmFrequency2560(int pin, int divisor) {
 	byte mode;
 	if ((pin >= 2 && pin <= 13) || (pin >= 44 && pin <= 46))
@@ -145,31 +135,32 @@ void setPwmFrequency2560(int pin, int divisor) {
 
 }
 
-
 void onTimer() {
- 
 	Serial.flush();
 	VelometerClass::detectSpeed();
- 
 }
 
-void setup() 
+void setup()
 {
 	Serial.begin(115200);
- 
 	while (!Serial) {
-		; 
+		;
 	}
 	setPwmFrequency2560(6, 1024);
 	MyUtils.println("welcome to clean robot");
 	FlexiTimer2::set(Constant::velometerPeriod * 1000, onTimer); // 500ms period
 	FlexiTimer2::start();
 	mc.setSpeed(150);
-
+	randomSeed(analogRead(0));
 }
+
+
+
+
 
 void loop()
 {
-	
+	ctrl->loop();
+
 }
 
