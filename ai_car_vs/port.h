@@ -27,7 +27,6 @@ const int left_back_gd = 46;
 const int left_forward_gd = 48;
 const int right_back_gd = 50;
 const int right_forward_gd = 52;
-
 const int forward_left_gd = 52;
 const int forward_right_gd = 52;
 

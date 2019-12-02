@@ -77,8 +77,8 @@ void setPwmFrequency(int pin, int divisor) {
 	}
 }
 
-MyMotorClass leftMotor = MyMotorClass(motorA2, motorA1, pwdA);
-MyMotorClass rightMotor = MyMotorClass(motorB1, motorB2, pwdB);
+MyMotorClass leftMotor = MyMotorClass(motorA1, motorA2, pwdA);
+MyMotorClass rightMotor = MyMotorClass(motorB2, motorB1, pwdB);
 MotorControllerClass mc = MotorControllerClass(&rightMotor, &leftMotor);
 Controller* ctrl = Controller::newInstance(&mc);
 
@@ -148,10 +148,12 @@ void setup()
 	}
 	setPwmFrequency2560(6, 1024);
 	MyUtils.println("welcome to clean robot");
-	FlexiTimer2::set(Constant::velometerPeriod * 1000, onTimer); // 500ms period
-	FlexiTimer2::start();
-	mc.setSpeed(150);
+	//FlexiTimer2::set(Constant::velometerPeriod * 1000, onTimer); // 500ms period
+	//FlexiTimer2::start();
+	mc.setSpeed(50);
 	randomSeed(analogRead(0));
+ 
+
 }
 
 

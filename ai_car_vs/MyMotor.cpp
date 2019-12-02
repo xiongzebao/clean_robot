@@ -16,6 +16,8 @@ void MyMotorClass::init(int in1, int in2, int en)
 	pinMode(in1, OUTPUT);
 	pinMode(in2, OUTPUT);
 	pinMode(en, OUTPUT);
+	digitalWrite(in1, LOW);
+	digitalWrite(in2, LOW);
 
 }
 

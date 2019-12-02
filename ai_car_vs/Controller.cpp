@@ -12,7 +12,10 @@ int fast_back_crash_times = 0;
 Controller* Controller::instance = nullptr;
 
 auto cb = [](int x) {
+	MyUtils.println("cb-----------");
 	Controller::instance->is_interrupt = false;
+	Controller::instance->is_finish_forward_back = true;
+	//Controller::instance->forward();
 };
 
 void Controller::on_forward_right_crash()
@@ -29,7 +32,8 @@ void Controller::on_forward_right_crash()
 	int level_right_forward = digitalRead(right_forward_gd);
 	int level_right_back = digitalRead(right_back_gd);
 
-
+	/*
+	//Ç°ÓÒÅö×²£¬ 
 	if (level_forward_right == 0) {
 		if (digitalRead(level_forward_left) == 0) {
 			if (level_left_forward == 1
@@ -62,7 +66,7 @@ void Controller::on_forward_right_crash()
 		instance->right();
 		return;
 	}
-
+	*/
 	auto a_lambda_func = [](int x) {
 		instance->left(60, cb);
 	};
@@ -76,6 +80,7 @@ void Controller::on_forward_left_crash()
 	instance->is_finish_forward_back = true;
 	instance->is_interrupt = true;
 
+	/* 
 	int level_forward_right = digitalRead(forward_right_gd);
 	int level_forward_left = digitalRead(forward_left_gd);
 
@@ -121,8 +126,12 @@ void Controller::on_forward_left_crash()
 		}
 	}
 
+
+	*/
 		auto a_lambda_func = [](int x) {
+			MyUtils.println("on_forward_left_crash finshi");
 			instance->right(60, cb);
+			
 		};
 		instance->mc->back(350, a_lambda_func);
 		return;
@@ -147,10 +156,11 @@ void Controller::on_back_right_crash()
 	auto a_lambda_func = [](int x) {
 		if (fast_back_crash_times >= 2) {
 			instance->left(turn_resulution * 5, cb);
+			return;
 		}
 		instance->left(turn_resulution, cb);
 	};
-	instance->mc->forward(200, a_lambda_func);
+	instance->forward(200, a_lambda_func);
 
 }
 
@@ -171,10 +181,11 @@ void Controller::on_back_left_crash()
 
 		if (fast_back_crash_times >= 2) {
 			instance->left(turn_resulution * 5, cb);
+			return;
 		}
 		instance->left(turn_resulution, cb);
 	};
-	instance->mc->forward(200, a_lambda_func);
+	instance->forward(200, a_lambda_func);
 }
 
 void Controller::initPort()
@@ -211,23 +222,60 @@ Controller::Controller(MotorControllerClass* mc)
 
 void Controller::forward_back()
 {
-	if (is_interrupt || !is_finish_forward_back) {
+	 
+	//MyUtils.println("is_interrupt:");
+	//Serial.print(is_interrupt);
+
+	//MyUtils.println("is_finish_forward_back:");
+	//Serial.print(is_finish_forward_back);
+	//MyUtils.println("f");
+	//if (instance->is_interrupt == true) {
+	//	MyUtils.println("a");
+	//}
+	//if (instance->is_finish_forward_back == false) {
+	//	MyUtils.println("b");
+	//}
+	if (instance->is_interrupt==true || instance->is_finish_forward_back==false) {
+	//	MyUtils.println("return:");
 		return;
 	}
-	is_finish_forward_back = false;
+
+	MyUtils.println("kkkkkkkkk");
+	instance->is_finish_forward_back = false;
 	auto a_lambda_func = [](int x) {
-		auto f = [](int x) {
+		MyUtils.println("123456677888");
+	auto f = [](int x) {
+		MyUtils.println("9999999999");
 			instance->is_finish_forward_back = true;
 		};
 		instance->back(200, f);
+		//instance->stop();
 	};
-	mc->forward(400, a_lambda_func);
+	instance->mc->forward(400, a_lambda_func);
+	//String action = "forward_back:" + 0;
+	//add_path(action);
+	//MyUtils.println("f");
 }
 
 void Controller::loop() {
-	delay(10);
-	forward_back();
+	int level_forward_right = digitalRead(forward_right_gd);
+	int level_forward_left = digitalRead(forward_left_gd);
+	int level_back_right = digitalRead(back_right_gd);
+	int level_back_left = digitalRead(back_left_gd);
+	//if (level_forward_left == 0){
+	//	on_forward_left_crash();
+	//}
+	//if (level_forward_right == 0){
+	//	on_forward_right_crash();
+	//}
+	//if (level_back_right == 0){
+	//	on_back_right_crash();
+	//}
+	//if (level_back_left == 0){
+	//	on_back_left_crash();
+	//}
 
+	forward_back();
 }
 
 
@@ -367,31 +415,68 @@ void Controller::back()
 
 void Controller::left()
 {
+	if (mc->state == MotorControllerClass::RIGHT) {
+		return;
+	}
+	mc->left();
+	String action = "left:" + 0;
+	add_path(action);
 }
 
 void Controller::right()
 {
+	if (mc->state == MotorControllerClass::RIGHT) {
+		return;
+	}
+	mc->right();
+	String action = "right:" + 0;
+	add_path(action);
+}
+
+bool Controller::is_circle()
+{
+	if (path_array_index < 6) {
+		return false;
+	}
+	for (int i = 2; i < 20; i++)
+	{
+		if (path_array_index + 1 < i * 3) {
+			return false;
+		}
+		for (int j = 0; j < i; j++)
+		{
+			if (path_array[j].compareTo(path_array[j + i]) != 0) {
+				return false;
+			}
+		}
+		for (int k = i; k < (i + 1) * 2; k++)
+		{
+			if (path_array[k].compareTo(path_array[k + i]) != 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+	return false;
 }
 
 void Controller::back_right()
 {
 	auto a_lambda_func = [](int x) {
-
 		instance->right(90, cb);
-
 	};
-
 	instance->back(100, a_lambda_func);
 }
 
 void Controller::back_left()
 {
+	if (is_circle()) {
+		//turnRight(random() % 360);
+		return;
+	}
 	auto a_lambda_func = [](int x) {
-
 		instance->left(90, cb);
-
 	};
-
 	instance->back(100, a_lambda_func);
 }
 
@@ -416,35 +501,68 @@ void Controller::turn_left_right_random(const int degree)
 
 void Controller::left(int degree)
 {
+	if (mc->state == MotorControllerClass::LEFT) {
+		return;
+	}
 	mc->turnLeft(degree);
+	String action = "left:" + degree;
+	add_path(action);
 }
 
 void Controller::right(int degree)
 {
+	if (mc->state == MotorControllerClass::RIGHT) {
+		return;
+	}
 	mc->turnRight(degree);
+	String action = "right:" + degree;
+	add_path(action);
 }
 
 void Controller::left(int degree, void(*f)(int))
 {
+	if (mc->state == MotorControllerClass::LEFT) {
+		return;
+	}
 	mc->turnLeft(degree, f);
+	String action = "left:" + degree;
+	add_path(action);
 }
 
 void Controller::right(int degree, void(*f)(int))
 {
+	if (mc->state == MotorControllerClass::RIGHT) {
+		return;
+	}
 	mc->turnRight(degree, f);
+	String action = "right:" + degree;
+	add_path(action);
 }
 
 void Controller::back(int degree, void(*f)(int))
 {
+	if (mc->state == MotorControllerClass::BACK) {
+		return;
+	}
 	mc->back(degree, f);
+	String action = "back:" + degree;
+	add_path(action);
 }
 
 void Controller::forward(int degree, void(*f)(int))
 {
+	if (mc->state == MotorControllerClass::FORWARD) {
+		return;
+	}
+	mc->forward(degree, f);
+	String action = "forward:" + degree;
+	add_path(action);
+
 }
 
 void Controller::stop()
 {
+	mc->stop();
 
 }
 

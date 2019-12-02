@@ -28,7 +28,7 @@ public:
 	static const int FOUR_WHEEL_DRIVER = 1;
 	static const int TWO_WHEEL_DRIVER = 2;
 	static void onTimer( );
-	static 	 const int PATH_MAX_SIZE = 100;
+
 	
 
 
@@ -46,8 +46,7 @@ public:
 	static bool left_finished  ;
 	static bool right_finished  ;
 	bool is_forward_back = false;
-	String path_array[PATH_MAX_SIZE];
-	int path_array_index=-1;
+	
 	
 
 
@@ -62,16 +61,7 @@ public:
 	//控制个两个电机
 	void init(MyMotorClass* motor1, MyMotorClass* motor2);
 	
-	void add_path(String path_str) {
-		if (path_array_index == PATH_MAX_SIZE - 1) {
-			path_array_index = -1;
-		}
-		path_array_index++;
-		path_array[path_array_index] = path_str;
-	
-	}
 
-	bool is_circle();
 	
 	void forward();
 	void setSpeed(int speed);

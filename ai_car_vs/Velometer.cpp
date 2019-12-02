@@ -28,12 +28,11 @@ void VelometerClass::detectSpeed()
 //左轮栅格计数中断响应
 void   VelometerClass::onLeftCount(){
 
-	if (this->leftSum % 50 == 0) {
-		MyUtils.print("leftSum:");
+	/*if (this->leftSum % 50 == 0) {
+		MyUtils.print("l:");
 		MyUtils.println(leftSum);
 		MyUtils.println(this->hasLeftPedometer);
-
-	}
+	}*/
 	if(this->hasLeftPedometer) {//计步器
 		this->currentLeftGridCount++;
 		if (this->currentLeftGridCount % 50 == 0) {
@@ -57,7 +56,12 @@ void   VelometerClass::onLeftCount(){
 //右轮栅格计数中断响应
 void   VelometerClass::onRightCount()
 {
-	//Serial.println(currentRightGridCount);
+	//if (this->rightSum % 50 == 0) {
+	//	MyUtils.print("r:");
+	//	MyUtils.println(rightSum);
+	//	MyUtils.println(this->hasLeftPedometer);
+
+	//}
 	if (this->hasRightPedometer) {
 		this->currentRightGridCount++;
 		 
@@ -130,6 +134,7 @@ void   VelometerClass::addRightPedometer(int zhuanshu, void(*callback)(int))
 	this->rightAllGridCount = zhuanshu * this->gridNum;
 	this->onRightPedometer = callback;
 	this->hasRightPedometer = true;
+	
 	MyUtils.println("addRightPedometer");
 }
 
@@ -138,6 +143,7 @@ void VelometerClass::removeRightPedometer()
 	this->rightAllGridCount = 0;
 	this->onRightPedometer = nullptr;
 	this->hasRightPedometer = false;
+	this->currentRightGridCount = 0;
 	MyUtils.println("removeRightPedometer");
 }
 
@@ -146,6 +152,7 @@ void VelometerClass::removeLeftPedometer()
 	this->leftAllGridCount = 0;
 	this->onLeftPedometer = nullptr;
 	this->hasLeftPedometer = false;
+	this->currentLeftGridCount = 0;
 	MyUtils.println("removeLeftPedometer");
 }
 

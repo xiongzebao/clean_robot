@@ -102,8 +102,7 @@ void MotorControllerClass::turnLeft(int degree)
 	if (this->state == TURN_LEFT) {
 		return;
 	}
-	String path_str = "turn_left:" + degree;
-	path_array[0] = path_str;
+ 
 	auto a_lambda_func = [](int x) {
 		MyUtils.println("turnLeft finish");
 		instance->forward();
@@ -134,10 +133,7 @@ void MotorControllerClass::turnLeft(int degree, void(*f)(int))
 	if (this->state == TURN_LEFT) {
 		return;
 	}
-	if (is_circle()) {
-		turnRight(random() % 360);
-		return;
-	}
+
 	this->velometer.removePedometer();
 	this->state = TURN_LEFT;
 
@@ -157,10 +153,7 @@ void MotorControllerClass::turnRight(int degree, void(*f)(int))
 	if (this->state == TURN_RIGHT) {
 		return;
 	}
-	if (is_circle()){
-		turnRight(random() % 360);
-		return;
-	}
+
 	this->velometer.removePedometer();
 	this->state = TURN_RIGHT;
 	this->velometer.addRightPedometer(degree, f);//搞不清楚为什么addLeftPedometer不行！
@@ -347,32 +340,7 @@ void MotorControllerClass::init(MyMotorClass* motor1, MyMotorClass* motor2)
 
 
 
-bool MotorControllerClass::is_circle()
-{
-	if (path_array_index < 6) {
-		return false;
-	}
-	for (int i = 2; i < 20; i++)
-	{
-		if (path_array_index + 1 < i * 3) {
-			return false;
-		}
-		for (int j = 0; j < i; j++)
-		{
-			if (path_array[j].compareTo(path_array[j + i]) != 0) {
-				return false;
-			}
-		}
-		for (int k = i; k < (i + 1) * 2; k++)
-		{
-			if (path_array[k].compareTo(path_array[k + i]) != 0) {
-				return false;
-			}
-		}
-		return true;
-	}
-	return false;
-}
+
 
 void MotorControllerClass::forward()
 {
@@ -380,10 +348,6 @@ void MotorControllerClass::forward()
 		return;
 	}
 
-	if (is_circle()) {
-		turnLeft(random() % 360);
-		return;
-	}
 	this->velometer.removePedometer();
 	m1->forward();
 	m2->forward();
@@ -412,10 +376,6 @@ void MotorControllerClass::back()
 	if (state == BACK)
 		return;
 
-	if (is_circle()) {
-		turnLeft(random() % 360);
-		return;
-	}
 	this->velometer.removePedometer();
 	m1->back();
 	m2->back();
@@ -431,10 +391,7 @@ void MotorControllerClass::left()
 {
 	if (state == LEFT)
 		return;
-	if (is_circle()) {
-		turnLeft(random() % 360);
-		return;
-	}
+
 	m1->forward();
 	m2->brake();
 
@@ -450,10 +407,7 @@ void MotorControllerClass::right()
 {
 	if (state == RIGHT)
 		return;
-	if (is_circle()) {
-		turnLeft(random() % 360);
-		return;
-	}
+
 	this->velometer.removePedometer();
 	m1->brake();
 	m2->forward();
